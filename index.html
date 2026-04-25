@@ -16,70 +16,117 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      padding: 14px;
+      box-sizing: border-box;
     }
+
+    /* Tarjeta */
     .card{
-      width: 92vw;
-      max-width: 900px;
-      padding: 22px 20px;
-      border-radius: 28px;
+      width: 96vw;
+      max-width: 1000px;
+      border-radius: 26px;
       background: rgba(255,255,255,0.06);
       box-shadow: 0 12px 40px rgba(0,0,0,0.35);
       border: 1px solid rgba(255,255,255,0.10);
-      text-align:center;
+      padding: 14px;
+      box-sizing: border-box;
     }
 
-    /* FOTO */
-    
+    /* Layout 2 columnas (iPad friendly) */
+    .layout{
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      gap: 14px;
+      -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+      align-items: stretch;
+    }
 
-.photo{
-  width: 100%;
-  height: 130px;            /* 🔥 tamaño del banner (chico pero visible) */
-  object-fit: cover;        /* ✅ recortada */
-  object-position: center 35%; /* ✅ sube un poquito el recorte (opcional) */
-  border-radius: 18px;
-  margin-bottom: 10px;
-  border: 1px solid rgba(255,255,255,0.10);
-  display: block;
-}
+    /* IZQUIERDA: foto */
+    .left{
+      -webkit-box-flex: 1;
+      -ms-flex: 1 1 48%;
+      flex: 1 1 48%;
+      min-width: 280px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.05);
+      height: 420px; /* Alto para que se vea “completa” en horizontal */
+    }
 
+    /* Foto completa (sin recorte) */
+    .photo{
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;          /* ✅ muestra toda la foto */
+      background: rgba(0,0,0,0.18); /* bandas prolijas si la foto es vertical */
+    }
 
+    /* DERECHA: datos */
+    .right{
+      -webkit-box-flex: 1;
+      -ms-flex: 1 1 52%;
+      flex: 1 1 52%;
+      min-width: 300px;
+      text-align: center;
+      padding: 6px 6px 2px 6px;
+      box-sizing: border-box;
+    }
 
     .time{
-      font-size: 76px;
+      font-size: 64px;
       line-height: 1.05;
       letter-spacing: 1px;
-      font-weight: 700;
-      margin: 6px 0 10px;
+      font-weight: 800;
+      margin: 6px 0 6px;
     }
+
     .date{
-      font-size: 20px;
+      font-size: 18px;
       opacity: .9;
-      margin: 0 0 14px;
+      margin: 0 0 10px;
     }
+
     .row{
       display:flex;
-      gap: 14px;
+      gap: 12px;
       justify-content:center;
       flex-wrap:wrap;
-      margin-top: 8px;
+      margin-top: 10px;
     }
+
     .pill{
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 999px;
-      padding: 12px 16px;
-      font-size: 20px;
+      padding: 10px 12px;
       min-width: 200px;
+      box-sizing: border-box;
     }
-    .label{ opacity:.75; font-size: 14px; display:block; margin-bottom: 6px; letter-spacing: .3px; }
-    .value{ font-size: 28px; font-weight: 700; }
 
-    .btnbar{ margin-top: 14px; }
+    .label{
+      opacity:.75;
+      font-size: 13px;
+      display:block;
+      margin-bottom: 5px;
+      letter-spacing: .3px;
+    }
+
+    .value{
+      font-size: 24px;
+      font-weight: 750;
+    }
+
+    .btnbar{ margin-top: 12px; }
+
     button{
       border:0;
       border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 15px;
+      padding: 9px 13px;
+      font-size: 14px;
       background: rgba(231,238,252,0.14);
       color: #e7eefc;
       cursor:pointer;
@@ -87,64 +134,97 @@
     }
     button:active{ transform: scale(0.98); }
 
-    /* Footer */
     .footer{
-      margin-top: 18px;
-      padding-top: 14px;
+      margin-top: 16px;
+      padding-top: 12px;
       border-top: 1px solid rgba(255,255,255,0.10);
     }
+
     .family{
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
-    .quote{
-      font-size: 18px;
-      opacity: 0.92;
-      font-style: italic;
-      padding: 0 10px;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      margin-bottom: 4px;
     }
 
-    .small{ font-size: 13px; opacity: .7; margin-top: 10px; }
+    .quote{
+      font-size: 16px;
+      opacity: 0.92;
+      font-style: italic;
+      padding: 0 8px;
+    }
+
+    .small{
+      font-size: 12px;
+      opacity: .7;
+      margin-top: 8px;
+    }
+
+    /* En vertical (pantallas angostas) apila */
+    @media (max-width: 820px){
+      .layout{
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+      }
+      .left{
+        height: 280px; /* foto grande en vertical */
+        min-width: 0;
+      }
+      .time{ font-size: 60px; }
+    }
   </style>
 </head>
 
 <body>
   <div class="card">
+    <div class="layout">
 
-    <img src="IMG_20221216_200058341_Original.jpeg" class="photo" alt="Daiu y Junior">
-    
-
-    <div id="time" class="time">--:--:--</div>
-    <div id="date" class="date">Cargando fecha…</div>
-
-    <div class="row">
-      <div class="pill">
-        <span class="label">Temperatura</span>
-        <span id="temp" class="value">-- °C</span>
+      <!-- IZQUIERDA: FOTO COMPLETA -->
+      <div class="left">
+        <!-- Usamos URL ABSOLUTA + ?v=1 para evitar caché -->
+        <img
+          src="https://camysawinkohl-ops.github.io/Reloj-Temp/IMG_20221216_200058341_Original.jpeg?v=1"
+          class="photo"
+          alt="Foto"
+        >
       </div>
-      <div class="pill">
-        <span class="label">Ubicación</span>
-        <span id="loc" class="value" style="font-size:18px;font-weight:600;">Buenos Aires </span>
+
+      <!-- DERECHA: DATOS -->
+      <div class="right">
+        <div id="time" class="time">--:--:--</div>
+        <div id="date" class="date">Cargando fecha…</div>
+
+        <div class="row">
+          <div class="pill">
+            <span class="label">Temperatura</span>
+            <span id="temp" class="value">-- °C</span>
+          </div>
+          <div class="pill">
+            <span class="label">Ubicación</span>
+            <span id="loc" class="value" style="font-size:16px;font-weight:650;">Buenos Aires (fijo)</span>
+          </div>
+        </div>
+
+        <div class="btnbar">
+          <button onclick="useGeolocation()">Usar mi ubicación</button>
+          <button onclick="refreshWeather()">Actualizar temp</button>
+        </div>
+
+        <div class="footer">
+          <div class="family">Daiu y Junior</div>
+          <div class="quote" id="quote">"Lo mejor está por venir."</div>
+          <div id="status" class="small"></div>
+        </div>
       </div>
-    </div>
 
-    <div class="btnbar">
-      <button onclick="useGeolocation()">Usar mi ubicación</button>
-      <button onclick="refreshWeather()">Actualizar temp</button>
-    </div>
-
-    <div class="footer">
-      <div class="family">Familia Sawin</div>
-      <div class="quote" id="quote">"Hoy es un buen día para empezar."</div>
-      <div id="status" class="small"></div>
     </div>
   </div>
 
 <script>
 (function(){
-  // --- Config por defecto: Buenos Aires (Obelisco aprox.)
+  // Config por defecto: Buenos Aires (Obelisco aprox.)
   var state = {
     lat: -34.6037,
     lon: -58.3816,
@@ -167,7 +247,7 @@
     var ss = pad(now.getSeconds());
     timeEl.innerHTML = hh + ":" + mm + ":" + ss;
 
-    // Fecha simple (evita Intl para máxima compatibilidad)
+    // Fecha simple (sin Intl por compatibilidad)
     var days = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
     var months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
     dateEl.innerHTML = days[now.getDay()] + " " + now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear();
@@ -177,7 +257,7 @@
     statusEl.innerHTML = msg || "";
   }
 
-  // XHR (evita fetch para Safari antiguo)
+  // XHR (evita fetch para Safari viejo)
   function xhrGet(url, onOk, onErr){
     try{
       var x = new XMLHttpRequest();
@@ -197,7 +277,6 @@
     }
   }
 
-  // Open-Meteo current temperature_2m
   function buildWeatherUrl(){
     return "https://api.open-meteo.com/v1/forecast"
       + "?latitude=" + encodeURIComponent(state.lat)
@@ -225,7 +304,7 @@
         setStatus("Error parseando respuesta.");
       }
     }, function(err){
-      setStatus("No pude traer clima (" + err + "). Tip: usá HTTPS (GitHub Pages ya lo es).");
+      setStatus("No pude traer clima (" + err + ").");
     });
   };
 
@@ -245,11 +324,11 @@
     }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
   };
 
-  // Frases motivacionales (rotan)
+  // Frases (rotan)
   var quotes = [
-    "Hoy es un buen día para empezar.",
-    "Paso a paso, se llega lejos.",
     "Lo mejor está por venir.",
+    "Paso a paso, se llega lejos.",
+    "Hoy es un buen día para empezar.",
     "La constancia le gana al talento.",
     "Hacelo simple, hacelo posible."
   ];
@@ -260,19 +339,20 @@
     if(el){ el.innerHTML = '"' + q + '"'; }
   }
 
-  // Inicialización
+  // Init
   tickClock();
   setInterval(tickClock, 1000);
 
   setRandomQuote();
-  setInterval(setRandomQuote, 60 * 60 * 1000); // cambia cada 1 hora
+  setInterval(setRandomQuote, 60 * 60 * 1000); // 1 hora
 
   refreshWeather();
-  setInterval(refreshWeather, 10 * 60 * 1000); // refresco temp cada 10 min
+  setInterval(refreshWeather, 10 * 60 * 1000); // 10 min
 })();
 </script>
 
 </body>
 </html>
+
 
 
