@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Reloj + Temperatura</title>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body{
+      font-family: -apple-system, Helvetica, Arial, sans-serif;
+      background: #0b1220;
+      color: #e7eefc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .card{
+      width: 92vw;
+      max-width: 900px;
+      padding: 28px 24px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.10);
+      text-align:center;
+    }
+    .time{
+      font-size: 76px;
+      line-height: 1.05;
+      letter-spacing: 1px;
+      font-weight: 700;
+      margin: 6px 0 10px;
+    }
+    .date{
+      font-size: 22px;
+      opacity: .9;
+      margin: 0 0 18px;
+    }
+    .row{
+      display:flex;
+      gap: 14px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top: 8px;
+    }
+    .pill{
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 20px;
+      min-width: 220px;
+    }
+    .label{ opacity:.75; font-size: 14px; display:block; margin-bottom: 6px; letter-spacing: .3px; }
+    .value{ font-size: 28px; font-weight: 700; }
+    .small{ font-size: 13px; opacity: .7; margin-top: 16px; }
+    .btnbar{ margin-top: 14px; }
+    button{
+      border:0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 15px;
+      background: rgba(231,238,252,0.14);
+      color: #e7eefc;
+      cursor:pointer;
+    }
+    button:active{ transform: scale(0.98); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="time" class="time">--:--:--</div>
+    <div id="date" class="date">Cargando fecha…</div>
+
+    <div class="row">
+      <div class="pill">
+        <span class="label">Temperatura</span>
+        <span id="temp" class="value">-- °C</span>
+      </div>
+      <div class="pill">
+        <span class="label">Ubicación</span>
+        <span id="loc" class="value" style="font-size:18px;font-weight:600;">Buenos Aires (fijo)</span>
+      </div>
+    </div>
+
+    <div class="btnbar">
+      <button onclick="useGeolocation()">Usar mi ubicación</button>
+      <button onclick="refreshWeather()">Actualizar temp</button>
+    </div>
+
+    <div id="status" class="small"></div>
+  </div>
+
+<script>
+(function(){
+  // --- Config por defecto: Buenos Aires (Obelisco aprox.)
+  var state = {
+    lat: -34.6037,
+    lon: -58.3816,
+    tz: "America/Argentina/Buenos_Aires",
+    label: "Buenos Aires (fijo)"
+  };
+
+  var timeEl = document.getElementById("time");
+  var dateEl = document.getElementById("date");
+  var tempEl = document.getElementById("temp");
+  var locEl  = document.getElementById("loc");
+  var statusEl = document.getElementById("status");
+
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+
+  function tickClock(){
+    var now = new Date();
+    var hh = pad(now.getHours());
+    var mm = pad(now.getMinutes());
+    var ss = pad(now.getSeconds());
+    timeEl.innerHTML = hh + ":" + mm + ":" + ss;
+
+    // Fecha simple (sin Intl para máxima compatibilidad)
+    var days = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    var months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    dateEl.innerHTML = days[now.getDay()] + " " + now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear();
+  }
+
+  function setStatus(msg){
+    statusEl.innerHTML = msg || "";
+  }
+
+  // XHR (evita fetch para Safari antiguo)
+  function xhrGet(url, onOk, onErr){
+    try{
+      var x = new XMLHttpRequest();
+      x.open("GET", url, true);
+      x.onreadystatechange = function(){
+        if (x.readyState === 4){
+          if (x.status >= 200 && x.status < 300){
+            onOk(x.responseText);
+          } else {
+            onErr("HTTP " + x.status);
+          }
+        }
+      };
+      x.send(null);
+    } catch(e){
+      onErr(e && e.message ? e.message : "Error XHR");
+    }
+  }
+
+  // Open-Meteo current temperature_2m
+  function buildWeatherUrl(){
+    // docs: /v1/forecast?latitude=...&longitude=...&current=temperature_2m ...
+    return "https://api.open-meteo.com/v1/forecast"
+      + "?latitude=" + encodeURIComponent(state.lat)
+      + "&longitude=" + encodeURIComponent(state.lon)
+      + "&current=temperature_2m"
+      + "&timezone=" + encodeURIComponent(state.tz);
+  }
+
+  window.refreshWeather = function(){
+    locEl.innerHTML = state.label;
+    setStatus("Actualizando temperatura…");
+
+    var url = buildWeatherUrl();
+    xhrGet(url, function(txt){
+      try{
+        var data = JSON.parse(txt);
+        var t = data && data.current && data.current.temperature_2m;
+        if (typeof t === "number" || typeof t === "string"){
+          tempEl.innerHTML = t + " °C";
+          setStatus("OK • Última actualización: " + new Date().toLocaleTimeString());
+        } else {
+          setStatus("No pude leer la temperatura (respuesta inesperada).");
+        }
+      }catch(e){
+        setStatus("Error parseando respuesta.");
+      }
+    }, function(err){
+      // Tip común: si el hosting no es https, el iPad puede bloquear contenido mixto
+      setStatus("No pude traer clima (" + err + "). Tip: usá un sitio HTTPS.");
+    });
+  };
+
+  window.useGeolocation = function(){
+    if (!navigator.geolocation){
+      setStatus("Este navegador no soporta geolocalización.");
+      return;
+    }
+    setStatus("Pidiendo ubicación… (aceptá el permiso)");
+    navigator.geolocation.getCurrentPosition(function(pos){
+      state.lat = pos.coords.latitude;
+      state.lon = pos.coords.longitude;
+      state.label = "Mi ubicación";
+      // tz la dejamos fija por compatibilidad; si viajás mucho, decime y lo adaptamos.
+      refreshWeather();
+    }, function(){
+      setStatus("No se pudo obtener ubicación (permiso/ señal).");
+    }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
+  };
+
+  // Inicialización
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  refreshWeather();
+  // refresco automático cada 10 min
+  setInterval(refreshWeather, 10 * 60 * 1000);
+})();
+</script>
+</body>
+</html>
